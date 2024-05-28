@@ -1,73 +1,57 @@
 import java.util.Scanner;
 
 public class SimpleCalculator {
-
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        try {
-            while (true) {
-                System.out.println("Введите выражение в формате 'a оператор b' (например, 5 + 3): ");
-                String input = scanner.nextLine();
+        while (true) {
+            System.out.println("Введите арифметическое выражение (например, 3+5) или 'exit' для завершения:");
+            String input = scanner.nextLine();
 
-                // Выход из цикла при пустом вводе
-                if (input.isEmpty()) {
-                    break;
-                }
-
-                // Разделение строки на операнды и оператор
-                String[] parts = input.split(" ");
-                if (parts.length != 3) {
-                    throw new IllegalArgumentException("Неверный формат выражения");
-                }
-
-                int a = parseOperand(parts[0]);
-                String operator = parts[1];
-                int b = parseOperand(parts[2]);
-
-                // Выполнение операции в зависимости от оператора
-                int result = 0;
-                switch (operator) {
-                    case "+":
-                        result = a + b;
-                        break;
-                    case "-":
-                        result = a - b;
-                        break;
-                    case "*":
-                        result = a * b;
-                        break;
-                    case "/":
-                        if (b == 0) {
-                            throw new ArithmeticException("Деление на ноль");
-                        }
-                        result = a / b;
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Неподдерживаемая арифметическая операция");
-                }
-
-                // Вывод результата
-                System.out.println("Результат: " + result);
-
-                // Очистка буфера ввода
-                scanner.nextLine();
+            if (input.equalsIgnoreCase("exit")) {
+                break;
             }
-        } catch (NumberFormatException e) {
-            System.out.println("Ошибка: Введены некорректные числа");
-        } catch (IllegalArgumentException | ArithmeticException e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        } finally {
-            scanner.close();
+
+            String result = calc(input);
+            System.out.println("Результат: " + result);
         }
+
+        scanner.close();
     }
 
-    // Парсинг операнда и проверка на целое число
-    private static int parseOperand(String operand) {
+    public static String calc(String input) {
+        // Разделяем входную строку на части, используя пробел в качестве разделителя
+        String[] tokens = input.split(" ");
+
+        // Проверяем, что количество частей ровно 3 (два числа и оператор)
+        if (tokens.length != 3) {
+            return "throws Exception";
+        }
+
         try {
-            return Integer.parseInt(operand);
+            // Пытаемся преобразовать первую и третью части в целые числа
+            int a = Integer.parseInt(tokens[0]);
+            int b = Integer.parseInt(tokens[2]);
+
+            // Проверяем, что числа находятся в диапазоне от 1 до 10 включительно
+            if (a < 1 || a > 10 || b < 1 || b > 10) {
+                return "throws Exception";
+            }
+
+            // В зависимости от оператора выполняем соответствующую арифметическую операцию
+            return switch (tokens[1]) {
+                case "+" -> String.valueOf(a + b);
+                case "-" -> String.valueOf(a - b);
+                case "*" -> String.valueOf(a * b);
+                case "/" -> String.valueOf(a / b);
+                default -> throw new IllegalArgumentException("Invalid operator");
+            };
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Некорректный формат числа: " + operand);
+            // Если не удалось преобразовать строки в числа, выбрасываем исключение
+            return "throws Exception";
+        } catch (ArithmeticException | IllegalArgumentException e) {
+            // Обрабатываем исключения, связанные с арифметическими операциями и некорректными операторами
+            return "throws Exception";
         }
     }
 }
